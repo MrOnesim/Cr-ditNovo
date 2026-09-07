@@ -156,7 +156,7 @@ Ruego me confirmen la recepción y próximos pasos de mi solicitud.`;
           <div className="w-full md:w-2/5 shrink-0">
             <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-md aspect-4/3">
               <img
-                src="/src/assets/images/loan_approval_success_1788795046875.jpg"
+                src="/images/loan_approval_success.jpg"
                 alt="Acuerdo de financiación"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"

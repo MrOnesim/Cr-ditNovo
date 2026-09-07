@@ -78,7 +78,7 @@ export default function Step1Loan({ form, onChange, t, lang = 'es' }: Step1LoanP
       {/* Visual Project Banner Image */}
       <div className="relative rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 h-36 sm:h-44">
         <img
-          src="/src/assets/images/loan_project_banner_1788795022230.jpg"
+          src="/images/loan_project_banner.jpg"
           alt="Proyectos y financiación"
           className="w-full h-full object-cover object-center"
           referrerPolicy="no-referrer"

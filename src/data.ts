@@ -86,12 +86,13 @@ export function getInitialFormData(): FormData {
         amount: Number(parsed.amount) || INITIAL_FORM_STATE.amount,
         months: Number(parsed.months) || INITIAL_FORM_STATE.months,
         profile: parsed.profile || INITIAL_FORM_STATE.profile,
+        marketing: false, // Opt-in actif RGPD : non pré-cochée par défaut
       };
     }
   } catch {
     // Ignore storage issues
   }
-  return { ...INITIAL_FORM_STATE };
+  return { ...INITIAL_FORM_STATE, marketing: false };
 }
 
 export function calculateLoan(amount: number, months: number, profile: 'particuliers' | 'prestige' = 'particuliers'): SimulationResult {

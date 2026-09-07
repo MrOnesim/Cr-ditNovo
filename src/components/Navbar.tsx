@@ -25,7 +25,7 @@ export default function Navbar({ currentLang, onSelectLang }: NavbarProps) {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm ring-2 ring-emerald-500/20 bg-emerald-700 flex items-center justify-center shrink-0">
               <img
-                src="/src/assets/images/creditnovo_logo_1788796480997.jpg"
+                src="/images/logo.jpg"
                 alt="CréditNovo Logo"
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"

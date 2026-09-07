@@ -239,21 +239,24 @@ export default function Step4Summary({
         )}
       </div>
 
-      {/* 24. Communications marketing (Opt-in actif par défaut - Anomaly 7) */}
+      {/* 24. Communications marketing (Opt-in actif non pré-coché - Conforme RGPD) */}
       <div>
         <label
           htmlFor="marketing"
-          className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors"
+          className={`flex items-start gap-3 p-3.5 rounded-xl border transition-colors cursor-pointer ${
+            form.marketing ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200 hover:bg-slate-50'
+          }`}
         >
           <input
             id="marketing"
+            name="marketing"
             type="checkbox"
-            checked={form.marketing}
+            checked={Boolean(form.marketing)}
             onChange={(e) => onChange({ marketing: e.target.checked })}
             className="mt-1 w-4 h-4 text-emerald-600 rounded-sm border-slate-300 focus:ring-emerald-500 accent-emerald-600 shrink-0"
           />
           <span className="text-xs text-slate-600 leading-relaxed select-none">
-            <span className="font-bold text-slate-800">{t.marketingConsentTitle || 'Comunicaciones y seguimiento (opcional):'}</span>{' '}
+            <span className="font-bold text-slate-800">{t.marketingConsentTitle || t.marketingTitle || 'Comunicaciones y seguimiento (opcional):'}</span>{' '}
             {t.marketingLabel}
           </span>
         </label>

@@ -84,7 +84,7 @@ export default function LoanSidebar({ form, simulation, t }: LoanSidebarProps) {
         <div className="mt-5 pt-5 border-t border-slate-100 flex items-start gap-3">
           <div className="relative shrink-0">
             <img
-              src="/src/assets/images/advisor_sarah_portrait_1788794998007.jpg"
+              src="/images/advisor_sarah.jpg"
               alt={t.yourAdvisor}
               className="w-12 h-12 rounded-full object-cover ring-2 ring-emerald-500/25 shadow-xs"
               referrerPolicy="no-referrer"
