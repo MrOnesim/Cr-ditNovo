@@ -1,0 +1,6 @@
+{
+  "name": "CréditNovo — Solicitud de Préstamo",
+  "description": "Formulario completo de solicitud de préstamo en 4 pasos con simulación en tiempo real y respuesta inmediata.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
