@@ -8,6 +8,8 @@
     "server": "tsx server.ts",
     "db:init": "node scripts/init-db.mjs",
     "build": "vite build",
+    "deploy:embed": "node scripts/embed-admin.mjs",
+    "deploy:build": "npm run build && npm run deploy:embed",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"

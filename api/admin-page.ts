@@ -1,0 +1,3 @@
+// FICHIER GÉNÉRÉ par scripts/embed-admin.mjs pendant le build.
+// Ne pas modifier à la main.
+export const ADMIN_HTML: string = "<!doctype html>\n<html lang=\"fr\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>CréditNovo — Espace conseiller</title>\n    <meta name=\"robots\" content=\"noindex, nofollow\" />\n    <script type=\"module\" crossorigin src=\"/assets/admin-CZuVoALM.js\"></script>\n    <link rel=\"modulepreload\" crossorigin href=\"/assets/index-At2Dn33C.js\">\n    <link rel=\"stylesheet\" crossorigin href=\"/assets/index-DXITJQKY.css\">\n  </head>\n  <body>\n    <div id=\"root\"></div>\n  </body>\n</html>";

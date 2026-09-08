@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { ADMIN_HTML } from './api/admin-page.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -299,20 +300,21 @@ const distCandidates = [
   path.resolve(process.cwd(), 'dist'),
 ];
 const distDir = distCandidates.find((d) => fs.existsSync(d));
-if (distDir) {
+if (distDir || ADMIN_SLUG) {
   if (ADMIN_SLUG) {
-    const adminHtml = path.join(distDir, 'admin.html');
     // Le nom de fichier admin.html est masqué : on renvoie 404 pour être
-    // indiscernable des autres chemins inexistants.
+    // indiscernable des autres chemins inexistants. La page réelle est servie
+    // uniquement sur le chemin secret, depuis la chaîne embarquée au build.
     app.get('/admin.html', (_req, res) => res.status(404).type('text/plain').send('Not found'));
-    // L'espace conseiller est servi UNIQUEMENT sur le chemin secret.
-    app.get(`/${ADMIN_SLUG}`, (_req, res) => res.sendFile(adminHtml));
+    app.get(`/${ADMIN_SLUG}`, (_req, res) => res.type('html').send(ADMIN_HTML));
   }
-  app.use(express.static(distDir));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next();
-    res.sendFile(path.join(distDir, 'index.html'));
-  });
+  if (distDir) {
+    app.use(express.static(distDir));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next();
+      res.sendFile(path.join(distDir, 'index.html'));
+    });
+  }
 }
 
 // En local, `npm run server` exécute ce fichier directement.
