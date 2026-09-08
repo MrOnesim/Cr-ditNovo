@@ -10,11 +10,12 @@ import Step4Summary from './components/Step4Summary';
 import AnalysisModal from './components/AnalysisModal';
 import ConfirmationScreen from './components/ConfirmationScreen';
 
-import { FormData, ValidationErrors } from './types';
+import { FormData, ValidationErrors, StoredFile } from './types';
 import { getInitialFormData, calculateLoan, INITIAL_FORM_STATE } from './data';
 import { validateStep2, validateStep3, validateStep4 } from './lib/validate';
 import { translations, Lang } from './lib/content';
 import { COUNTRIES } from './lib/locale';
+import { submitApplication, toAbsoluteUrl } from './lib/api';
 
 export default function App() {
   const [form, setForm] = useState<FormData>(() => getInitialFormData());
@@ -24,6 +25,7 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [referenceNumber, setReferenceNumber] = useState<string>('');
+  const [storedFiles, setStoredFiles] = useState<StoredFile[]>([]);
 
   // Language state: defaults to Spanish ('es')
   const [lang, setLang] = useState<Lang>('es');
@@ -100,8 +102,30 @@ export default function App() {
       // Step 4: Submit application!
       // Generate stable reference NOVO-XXXXXX
       const randomCode = Math.floor(100000 + Math.random() * 900000);
-      setReferenceNumber(`NOVO-${randomCode}`);
+      const reference = `NOVO-${randomCode}`;
+      setReferenceNumber(reference);
+      setStoredFiles([]);
       setIsAnalyzing(true);
+
+      // Enregistrement de la demande + documents dans la base (Neon).
+      void submitApplication({
+        reference,
+        form,
+        simulation,
+        files: [
+          { kind: 'identityRecto', name: form.identityRecto?.name || '', type: form.identityRecto?.type || '', dataUrl: form.identityRecto?.dataUrl || '' },
+          { kind: 'identityVerso', name: form.identityVerso?.name || '', type: form.identityVerso?.type || '', dataUrl: form.identityVerso?.dataUrl || '' },
+          { kind: 'incomeFile', name: form.incomeFile?.name || '', type: form.incomeFile?.type || '', dataUrl: form.incomeFile?.dataUrl || '' },
+        ].filter((f) => f.dataUrl),
+      })
+        .then((res) => {
+          setStoredFiles(res.files.map((f) => ({ ...f, url: toAbsoluteUrl(f.path) })));
+        })
+        .catch((err) => {
+          // Le formulaire fonctionne aussi sans backend : les pièces jointes
+          // sont alors simplement mentionnées par leur nom.
+          console.warn('Enregistrement en base impossible, envoi sans liens :', err);
+        });
     }
   };
 
@@ -138,6 +162,7 @@ export default function App() {
     setErrors({});
     setIsSubmitted(false);
     setReferenceNumber('');
+    setStoredFiles([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -170,6 +195,7 @@ export default function App() {
             form={form}
             simulation={simulation}
             referenceNumber={referenceNumber}
+            storedFiles={storedFiles}
             onRestart={handleRestart}
             t={t}
           />

@@ -1,4 +1,4 @@
-import { Shield, Lock, PhoneCall, Globe, CheckCircle2 } from 'lucide-react';
+import { PhoneCall, Globe } from 'lucide-react';
 import { Lang } from '../lib/content';
 import { WHATSAPP_DISPLAY_PHONE } from '../data';
 

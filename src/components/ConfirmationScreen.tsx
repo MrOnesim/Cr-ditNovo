@@ -10,7 +10,7 @@ import {
   UserCheck,
   RotateCcw,
 } from 'lucide-react';
-import { FormData, SimulationResult } from '../types';
+import { FormData, SimulationResult, StoredFile } from '../types';
 import { COUNTRIES, formatCurrency } from '../lib/locale';
 import { WHATSAPP_PHONE, WHATSAPP_DISPLAY_PHONE, CONTACT_EMAIL, personalPurposes, proPurposes, employmentOptions } from '../data';
 import { Translations } from '../lib/content';
@@ -19,6 +19,7 @@ interface ConfirmationScreenProps {
   form: FormData;
   simulation: SimulationResult;
   referenceNumber: string;
+  storedFiles: StoredFile[];
   onRestart: () => void;
   t: Translations;
 }
@@ -27,6 +28,7 @@ export default function ConfirmationScreen({
   form,
   simulation,
   referenceNumber,
+  storedFiles,
   onRestart,
   t,
 }: ConfirmationScreenProps) {
@@ -53,6 +55,15 @@ export default function ConfirmationScreen({
     const formattedAmount = formatCurrency(form.amount, form.country);
     const formattedMonthly = formatCurrency(simulation.monthlyPayment, form.country);
     const formattedTotalCost = formatCurrency(simulation.totalCost, form.country);
+
+    // Liens publics vers les documents enregistrés (remplacent les images)
+    const linkFor = (kind: string) => {
+      const file = storedFiles.find((f) => f.kind === kind);
+      return file?.url || null;
+    };
+    const rectoLink = linkFor('identityRecto');
+    const versoLink = linkFor('identityVerso');
+    const incomeLink = linkFor('incomeFile');
 
     return `*SOLICITUD DE CRÉDITNOVO — EXPEDIENTE VALIDADO*
 📌 *Ref. expediente :* ${referenceNumber}
@@ -84,9 +95,9 @@ ${form.kind === 'professionnel' && form.companyName ? `• Empresa : ${form.comp
 • Ratio de endeudamiento : ${debtRatio}%
 ${form.iban ? `• IBAN : ${form.iban}\n` : ''}
 📄 *DOCUMENTACIÓN ADJUNTA*
-• Documento identidad anverso : ${form.identityRecto ? `Aportado (${form.identityRecto.name})` : 'Por transmitir'}
-• Documento identidad reverso : ${form.identityVerso ? `Aportado (${form.identityVerso.name})` : 'Por transmitir'}
-• Justificante de ingresos : ${form.incomeFile ? `Aportado (${form.incomeFile.name})` : 'Por transmitir'}
+• Documento identidad anverso : ${rectoLink ?? (form.identityRecto ? `Aportado (${form.identityRecto.name})` : 'Por transmitir')}
+• Documento identidad reverso : ${versoLink ?? (form.identityVerso ? `Aportado (${form.identityVerso.name})` : 'Por transmitir')}
+• Justificante de ingresos : ${incomeLink ?? (form.incomeFile ? `Aportado (${form.incomeFile.name})` : 'Por transmitir')}
 
 Consentimiento RGPD validado.
 Ruego me confirmen la recepción y próximos pasos de mi solicitud.`;

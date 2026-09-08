@@ -66,13 +66,15 @@ export default function Step3Situation({
       return;
     }
 
-    // Safeguard 1: File size limit (10MB)
-    const MAX_SIZE = 10 * 1024 * 1024;
+    // Safeguard 1: File size limit (3MB) — Vercel plafonne la requête à
+    // ~4.5 MB ; les images lourdes sont compressées automatiquement, seul
+    // un PDF brut volumineux peut être refusé ici.
+    const MAX_SIZE = 3 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       setUploadError(
         lang === 'es'
-          ? `El archivo ${file.name} supera el tamaño máximo permitido (10 MB).`
-          : `Le fichier ${file.name} est trop lourd (max 10 Mo).`
+          ? `El archivo ${file.name} supera el tamaño máximo permitido (3 MB).`
+          : `Le fichier ${file.name} est trop lourd (max 3 Mo).`
       );
       return;
     }
@@ -94,7 +96,55 @@ export default function Step3Situation({
       type: file.type,
     };
     onChange({ [field]: meta });
+
+    // Lecture du contenu réel pour pouvoir l'enregistrer côté serveur et
+    // partager un lien vers le document via WhatsApp.
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      // Réduction automatique des images volumineuses : Vercel limite la
+      // taille d'une requête à ~4.5 MB, on garde donc chaque image légère.
+      if (meta.type.startsWith('image/') && meta.size > 1.2 * 1024 * 1024) {
+        compressImage(dataUrl)
+          .then((compressed) =>
+            onChange({ [field]: { ...meta, type: compressed.type, dataUrl: compressed.dataUrl } })
+          )
+          .catch(() => onChange({ [field]: { ...meta, dataUrl } }));
+      } else {
+        onChange({ [field]: { ...meta, dataUrl } });
+      }
+    };
+    reader.onerror = () => setUploadError('Impossible de lire le fichier.');
+    reader.readAsDataURL(file);
   };
+
+  const compressImage = (dataUrl: string): Promise<{ dataUrl: string; type: string }> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 1600;
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const scale = MAX_DIM / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Canvas indisponible'));
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve({
+          dataUrl: canvas.toDataURL('image/jpeg', 0.82),
+          type: 'image/jpeg',
+        });
+      };
+      img.onerror = () => reject(new Error('Image illisible'));
+      img.src = dataUrl;
+    });
 
   const handleIbanChange = (val: string) => {
     // Force uppercase and clean whitespace

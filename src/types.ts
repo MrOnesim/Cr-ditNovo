@@ -71,3 +71,12 @@ export interface SimulationResult {
 }
 
 export type ValidationErrors = Partial<Record<keyof FormData | 'general', string>>;
+
+export interface StoredFile {
+  id: number;
+  kind: string; // 'identityRecto' | 'identityVerso' | 'incomeFile'
+  fileName: string;
+  mimeType: string;
+  path: string; // chemin relatif ex. /api/files/12/abc123
+  url?: string; // URL absolue construite côté front
+}
