@@ -12,16 +12,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = Number(process.env.PORT) || 8080;
 
-const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL est manquant. Créez un fichier .env (voir .env.example) avec l\'URL de votre base Neon.');
-  process.exit(1);
-}
+const DATABASE_URL = process.env.DATABASE_URL || '';
 
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+// Le serveur ne plante jamais à l'import : sans DATABASE_URL il reste
+// utilisable (pages, login) et les routes SQL renvoient une erreur lisible.
+const pool = DATABASE_URL
+  ? new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } })
+  : null;
+
+function db(): Pool {
+  if (!pool) {
+    throw new Error('DATABASE_URL manquante dans l\'environnement du serveur');
+  }
+  return pool;
+}
 
 // ── Authentification admin (token HMAC) ────────────────────────────────
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
@@ -121,7 +125,7 @@ if (ADMIN_SLUG) {
   // Liste des demandes (récapitulatifs, sans le contenu des fichiers)
   app.get(adminApi('/applications'), requireAuth, async (_req, res) => {
     try {
-      const result = await pool.query(
+      const result = await db().query(
         `SELECT a.*, json_agg(
            json_build_object(
              'id', f.id,
@@ -140,7 +144,7 @@ if (ADMIN_SLUG) {
       res.json(result.rows);
     } catch (err) {
       console.error('Erreur GET applications admin', err);
-      res.status(500).json({ error: 'Erreur interne' });
+      res.status(500).json({ error: err instanceof Error && err.message.includes('DATABASE_URL') ? err.message : 'Erreur interne' });
     }
   });
 
@@ -150,10 +154,10 @@ if (ADMIN_SLUG) {
       const id = Number(req.params.id);
       if (!Number.isInteger(id)) return res.status(400).json({ error: 'id invalide' });
 
-      const appRes = await pool.query('SELECT * FROM applications WHERE id = $1', [id]);
+      const appRes = await db().query('SELECT * FROM applications WHERE id = $1', [id]);
       if (appRes.rows.length === 0) return res.status(404).json({ error: 'Demande introuvable' });
 
-      const filesRes = await pool.query(
+      const filesRes = await db().query(
         `SELECT id, kind, file_name, mime_type, '/api/files/' || id || '/' || token AS path
          FROM application_files WHERE application_id = $1 ORDER BY id`,
         [id]
@@ -162,7 +166,7 @@ if (ADMIN_SLUG) {
       res.json({ ...appRes.rows[0], files: filesRes.rows });
     } catch (err) {
       console.error('Erreur GET application admin', err);
-      res.status(500).json({ error: 'Erreur interne' });
+      res.status(500).json({ error: err instanceof Error && err.message.includes('DATABASE_URL') ? err.message : 'Erreur interne' });
     }
   });
 } else {
@@ -171,8 +175,11 @@ if (ADMIN_SLUG) {
 
 // ── Santé ──────────────────────────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
+  if (!pool) {
+    return res.status(500).json({ ok: false, error: 'DATABASE_URL manquante dans l\'environnement Vercel' });
+  }
   try {
-    await pool.query('SELECT 1');
+    await db().query('SELECT 1');
     res.json({ ok: true, db: 'connected' });
   } catch (err) {
     res.status(500).json({ ok: false, error: String(err) });
@@ -193,7 +200,7 @@ app.post('/api/applications', async (req, res) => {
     return res.status(400).json({ error: 'files doit être un tableau' });
   }
 
-  const client = await pool.connect();
+  const client = await db().connect();
   try {
     await client.query('BEGIN');
 
@@ -273,7 +280,7 @@ app.get('/api/files/:id/:token', async (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return res.status(400).json({ error: 'id invalide' });
 
-    const result = await pool.query(
+    const result = await db().query(
       `SELECT file_name, mime_type, content, token FROM application_files WHERE id = $1`,
       [id]
     );
@@ -288,7 +295,7 @@ app.get('/api/files/:id/:token', async (req, res) => {
     res.send(file.content);
   } catch (err) {
     console.error('Erreur GET /api/files/:id/:token', err);
-    res.status(500).json({ error: 'Erreur interne' });
+    res.status(500).json({ error: err instanceof Error && err.message.includes('DATABASE_URL') ? err.message : 'Erreur interne' });
   }
 });
 
