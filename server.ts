@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { ADMIN_HTML } from './api/admin-page.js';
+import { ADMIN_HTML } from './lib/admin-page.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
