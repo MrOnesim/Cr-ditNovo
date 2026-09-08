@@ -27,7 +27,8 @@ const pool = new Pool({
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 // Slug secret : APP définit où se trouve l'espace conseiller
 // (URL /<slug> pour la page et /api/<slug>/... pour ses endpoints).
-const ADMIN_SLUG = (process.env.VITE_ADMIN_SLUG || '').replace(/^\/+|\/+$/g, '');
+// Valeur par défaut embarquée ; VITE_ADMIN_SLUG reste prioritaire.
+const ADMIN_SLUG = (process.env.VITE_ADMIN_SLUG || 'u4pmZaJsVCow').replace(/^\/+|\/+$/g, '');
 const adminApi = (p: string) => `/api/${ADMIN_SLUG}${p}`;
 const TOKEN_SECRET =
   process.env.JWT_SECRET ||

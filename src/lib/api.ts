@@ -44,8 +44,9 @@ export interface AdminApplication {
 const TOKEN_STORAGE_KEY = 'creditnovo-admin-token';
 
 // Slug secret : préfixe de l'API conseiller (/api/<slug>/...)
-// Injecté par Vite au build via VITE_ADMIN_SLUG (variable .env).
-export const ADMIN_SLUG = import.meta.env.VITE_ADMIN_SLUG || '';
+// Valeur par défaut embarquée au build (VITE_ADMIN_SLUG reste prioritaire).
+export const ADMIN_SLUG =
+  (import.meta.env.VITE_ADMIN_SLUG || 'u4pmZaJsVCow').replace(/^\/+|\/+$/g, '');
 
 function adminApiPath(path: string): string {
   return `/api/${ADMIN_SLUG}${path}`;
