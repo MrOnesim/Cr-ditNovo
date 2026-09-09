@@ -42,7 +42,7 @@ export default function Navbar({ currentLang, onSelectLang }: NavbarProps) {
           <div className="flex items-center gap-3 sm:gap-5">
             {/* Phone & WhatsApp contact */}
             <a
-              href={`https://wa.me/34672072061`}
+              href={`https://wa.me/34742084822`}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-200 transition-colors"

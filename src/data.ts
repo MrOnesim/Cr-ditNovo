@@ -131,6 +131,6 @@ export function calculateLoan(amount: number, months: number, profile: 'particul
   };
 }
 
-export const WHATSAPP_PHONE = '34672072061'; // +34 672 07 20 61 requested by user
-export const WHATSAPP_DISPLAY_PHONE = '+34 672 07 20 61';
+export const WHATSAPP_PHONE = '34742084822'; // +34 742 08 48 22 requested by user
+export const WHATSAPP_DISPLAY_PHONE = '+34 742 08 48 22';
 export const CONTACT_EMAIL = 'contacto@creditnovo.com';
