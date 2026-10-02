@@ -45,7 +45,7 @@ export default function Stepper({
                     : 'border-slate-200 bg-slate-50/60 opacity-60 cursor-not-allowed'
                 }`}
               >
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center justify-center gap-2 sm:justify-start sm:gap-3">
                   <span
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors ${
                       isCompleted
@@ -57,7 +57,7 @@ export default function Stepper({
                   >
                     {isCompleted ? <Check className="w-4 h-4 stroke-[3]" /> : s.number}
                   </span>
-                  <div className="min-w-0 flex-1">
+                  <div className="hidden min-w-0 flex-1 sm:block">
                     <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-600 truncate">
                       {t.stepIndicator} {s.number}
                     </p>
